@@ -44,10 +44,13 @@ function generateAccountNumber($length = 10) {
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $accountNumber = generateAccountNumber(); // Generate a random account number
+        $name = mysqli_real_escape_string($conn, $_POST['name']);
+        $contactNumber = mysqli_real_escape_string($conn, $_POST['contact_number']);
         $address = mysqli_real_escape_string($conn, $_POST['address']);
         
         // Insert consumer data
-        $sql = "INSERT INTO consumers (account_number, address) VALUES ('$accountNumber', '$address')";
+        $sql = "INSERT INTO consumers (account_number, name, contact_number, address) 
+                VALUES ('$accountNumber', '$name', '$contactNumber', '$address')";
 
         if (mysqli_query($conn, $sql)) {
             echo "<div class='alert alert-success mt-4'>Consumer added successfully!</div>";
@@ -61,9 +64,17 @@ function generateAccountNumber($length = 10) {
 
     <!-- Form to add consumer -->
     <form action="addconsumer.php" method="post" class="mt-4">
-      <div class="form-group mb-3">
-        <label for="address">Address:</label>
-        <input type="text" name="address" id="address" class="form-control bg-light border border-secondary" required>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name:</label>
+        <input type="text" name="name" id="name" class="form-control bg-light border border-secondary" placeholder="Enter consumer's name" required>
+      </div>
+      <div class="mb-3">
+        <label for="contact_number" class="form-label">Contact Number:</label>
+        <input type="text" name="contact_number" id="contact_number" class="form-control bg-light border border-secondary" placeholder="Enter consumer's contact number" required>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Address:</label>
+        <input type="text" name="address" id="address" class="form-control bg-light border border-secondary" placeholder="Enter consumer's address" required>
       </div>
       <button type="submit" class="btn btn-success mt-4">Add Consumer</button>
     </form>
