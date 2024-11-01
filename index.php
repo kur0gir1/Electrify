@@ -56,7 +56,6 @@ if (isset($_SESSION['username'])) {
     <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
       <ul class="navbar-nav">
         <li class="nav-item"><a href="index.php" class="nav-link active">Consumers Table</a></li>
-        <li class="nav-item"><a href="address.php" class="nav-link">Addresses Table</a></li>
         <li class="nav-item"><a href="meters.php" class="nav-link">Meters Table</a></li>
         <li class="nav-item"><a href="addconsumer.php" class="nav-link btn btn-dark">Add Consumer</a></li>
       </ul>
@@ -68,10 +67,8 @@ if (isset($_SESSION['username'])) {
     $order = isset($_GET['order']) && $_GET['order'] == 'asc' ? 'desc' : 'asc';
 
     // Adjust the SQL query to include sorting for consumers
-    $sql = "SELECT Consumers.consumer_id, Consumers.name, Consumers.account_number, Consumers.contact_details, Addresses.address, ElectricityMeters.meter_id
+    $sql = "SELECT Consumers.consumer_id, Consumers.name, Consumers.account_number, Consumers.contact_details, Consumers.address, Consumers.meter_id
             FROM Consumers
-            LEFT JOIN Addresses ON Consumers.consumer_id = Addresses.consumer_id
-            LEFT JOIN ElectricityMeters ON Addresses.address_id = ElectricityMeters.address_id
             ORDER BY $sort $order";
 
     $result = mysqli_query($conn, $sql);

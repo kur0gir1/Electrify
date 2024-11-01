@@ -30,11 +30,9 @@ if (isset($_SESSION['username'])) {
     .navbar-nav .nav-link {
       color: #FFD700; /* Yellow color for nav links */
     }
-
     .navbar-nav .nav-link.active {
-          font-weight: bold;
-      }
-
+      font-weight: bold;
+    }
     .navbar-nav .nav-link:hover {
       color: white; /* White color on hover */
     }
@@ -42,7 +40,6 @@ if (isset($_SESSION['username'])) {
       background-color: #000; /* Black background for the table */
       color: white; /* White text color in the table */
     }
-
     .table th, .table td {
       vertical-align: middle; /* Center align table cells */
     }
@@ -82,51 +79,38 @@ if (isset($_SESSION['username'])) {
     <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
       <ul class="navbar-nav">
         <li class="nav-item"><a href="index.php" class="nav-link">Consumers Table</a></li>
-        <li class="nav-item"><a href="address.php" class="nav-link">Addresses Table</a></li>
         <li class="nav-item"><a href="meters.php" class="nav-link text-light active">Meters Table</a></li>
         <li class="nav-item"><a href="addconsumer.php" class="nav-link btn btn-dark">Add Consumer</a></li>
       </ul>
     </nav>
 
-    <h2 class="text-center">Consumption Details by Consumer</h2>
+    <h2 class="text-center">Electricity Meters</h2>
 
     <?php
-    // Query to get total consumption and fees for each consumer
-    $consumptionSql = "
+    // Query to retrieve meter details along with the associated consumers
+    $meterSql = "
     SELECT 
-        c.account_number, 
-        c.meter_id, 
-        SUM(dcr.energy_consumed) AS daily_energy_consumed, 
-        SUM(wcr.energy_consumed) AS weekly_energy_consumed, 
-        SUM(mcr.energy_consumed) AS monthly_energy_consumed, 
-        mp.installation_fee, 
-        mp.taxes, 
-        mp.miscellaneous_fees 
+        em.meter_id, 
+        em.manufacture_date, 
+        em.installation_date, 
+        c.consumer_id,
+        c.account_number 
     FROM 
-        consumers c 
+        electricitymeters em 
     LEFT JOIN 
-        dailyconsumptionrecords dcr ON c.meter_id = dcr.meter_id 
-    LEFT JOIN 
-        weeklyconsumptionrecords wcr ON c.meter_id = wcr.meter_id 
-    LEFT JOIN 
-        monthlyconsumptionrecords mcr ON c.meter_id = mcr.meter_id 
-    LEFT JOIN 
-        monthlypay mp ON c.consumer_id = mp.consumer_id
-    GROUP BY 
-        c.account_number, c.meter_id
-";
+        consumers c ON em.meter_id = c.meter_id
+    ";
 
-    $result = mysqli_query($conn, $consumptionSql);
+    $result = mysqli_query($conn, $meterSql);
 
     if ($result && mysqli_num_rows($result) > 0) {
         echo "<table class='table mt-4'>"; // Striped table
         echo "<thead>";
         echo "<tr>";
-        echo "<th>Account Number</th>";
         echo "<th>Meter ID</th>";
-        echo "<th>Daily Consumption (kWh)</th>";
-        echo "<th>Weekly Consumption (kWh)</th>";
-        echo "<th>Monthly Consumption (kWh)</th>";
+        echo "<th>Manufacture Date</th>";
+        echo "<th>Installation Date</th>";
+        echo "<th>Account Number</th>";
         echo "<th>Action</th>";
         echo "</tr>";
         echo "</thead>";
@@ -134,41 +118,45 @@ if (isset($_SESSION['username'])) {
 
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
             echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['daily_energy_consumed']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['weekly_energy_consumed']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['monthly_energy_consumed']) . "</td>";
-            echo "<td><button class='btn btn-info view-monthly-pay' data-monthly-pay='" . htmlspecialchars($row['monthly_energy_consumed']) . "' data-installation-fee='" . htmlspecialchars($row['installation_fee']) . "' data-taxes='" . htmlspecialchars($row['taxes']) . "' data-misc-fees='" . htmlspecialchars($row['miscellaneous_fees']) . "'>View Monthly Pay</button></td>";
+            echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
+            echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
             echo "</tr>";
         }
 
         echo "</tbody>";
         echo "</table>";
     } else {
-        echo "<div class='alert alert-info mt-4'>No consumption records found for any consumers.</div>";
+        echo "<div class='alert alert-info mt-4'>No meter records found.</div>";
     }
 
     mysqli_close($conn);
     ?>
   </div>
 
-  <!-- Modal for Monthly Pay Details -->
-  <div class="modal fade" id="monthlyPayModal" tabindex="-1" aria-labelledby="monthlyPayModalLabel" aria-hidden="true">
+  <!-- Modal for Consumption Records -->
+  <div class="modal fade" id="consumptionModal" tabindex="-1" aria-labelledby="consumptionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="monthlyPayModalLabel" style="font-weight:600">Monthly Pay Details</h5>
+          <h5 class="modal-title" id="consumptionModalLabel" style="font-weight:600">Consumption Records</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p><strong>Monthly Consumption (kWh):</strong> <span id="monthlyConsumption"></span></p>
-          <p><strong>Base Monthly Pay (PHP):</strong> <span id="baseMonthlyPay"></span></p>
-          <p><strong>Installation Fee (PHP):</strong> <span id="installationFee"></span></p>
-          <p><strong>Taxes (PHP):</strong> <span id="taxes"></span></p>
-          <p><strong>Miscellaneous Fees (PHP):</strong> <span id="miscFees"></span></p>
-          <hr>
-          <p><strong>Total Monthly Pay (PHP):</strong> <span id="totalMonthlyPay"></span></p>
+          <table class="table" id="consumptionTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Energy Consumed (kWh)</th>
+                <th>Payment Period</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Consumption records will be populated here -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -179,23 +167,23 @@ if (isset($_SESSION['username'])) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
   <script>
     $(document).ready(function() {
-        $('.view-monthly-pay').on('click', function() {
-            var monthlyConsumption = $(this).data('monthly-pay');
-            var installationFee = parseFloat($(this).data('installation-fee'));
-            var taxes = parseFloat($(this).data('taxes'));
-            var miscFees = parseFloat($(this).data('misc-fees'));
-            
-            var baseMonthlyPay = (monthlyConsumption * 8).toFixed(2); // Change rate as needed, e.g., 8 PHP per kWh
-            var totalMonthlyPay = (parseFloat(baseMonthlyPay) + installationFee + taxes + miscFees).toFixed(2);
+        $('.view-consumption').on('click', function() {
+            var consumerId = $(this).data('consumer-id');
 
-            $('#monthlyConsumption').text(monthlyConsumption);
-            $('#baseMonthlyPay').text('₱' + baseMonthlyPay);
-            $('#installationFee').text('₱' + installationFee.toFixed(2));
-            $('#taxes').text('₱' + taxes.toFixed(2));
-            $('#miscFees').text('₱' + miscFees.toFixed(2));
-            $('#totalMonthlyPay').text('₱' + totalMonthlyPay);
-            
-            $('#monthlyPayModal').modal('show');
+            // Fetch consumption records for the selected consumer
+            $.ajax({
+                url: 'fetch_consumption_records.php', // URL of the PHP file to fetch data
+                type: 'POST',
+                data: { consumer_id: consumerId },
+                success: function(response) {
+                    // Populate the modal table with data
+                    $('#consumptionTable tbody').html(response);
+                    $('#consumptionModal').modal('show'); // Show the modal
+                },
+                error: function() {
+                    alert('Error fetching consumption records.');
+                }
+            });
         });
     });
   </script>

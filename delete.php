@@ -3,21 +3,16 @@ session_start();
 include 'database.php';
 
 // Check if both employeeID and payrollID are set and valid
-if (isset($_GET['employeeID']) && is_numeric($_GET['employeeID']) && 
-    isset($_GET['payrollID']) && is_numeric($_GET['payrollID'])) {
+if (isset($_GET['consumerID']) && is_numeric($_GET['consumerID'])){
 
-    $EmployeeID = (int)$_GET['employeeID'];
-    $PayrollID = (int)$_GET['payrollID'];
+    $consumerID= (int)$_GET['consumerID'];
 
     // SQL to delete from employees
-    $deleteEmployeesSQL = "DELETE FROM employees WHERE EmployeeID = ?";
-    
-    // SQL to delete from payroll
-    $deletePayrollSQL = "DELETE FROM payroll WHERE PayrollID = ?";
+    $deleteEmployeesSQL = "DELETE FROM consumers WHERE consumerID = ?";
 
     // Prepare the statement for deleting from employees
     if ($stmt1 = mysqli_prepare($conn, $deleteEmployeesSQL)) {
-        mysqli_stmt_bind_param($stmt1, "i", $EmployeeID);
+        mysqli_stmt_bind_param($stmt1, "i", $consumerID);
         mysqli_stmt_execute($stmt1);
         mysqli_stmt_close($stmt1);
     } else {

@@ -25,22 +25,17 @@ function generateAccountNumber($length = 10) {
   <style>
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: black; /* Black background for the body */
-      color: #FFD700; /* Yellow text color */
+      background-color: black;
+      color: #FFD700;
     }
     .navbar {
-      background-color: black; /* Black navbar */
+      background-color: black;
     }
     .navbar-nav .nav-link {
-      color: #FFD700; /* Yellow nav links */
+      color: #FFD700;
     }
     .navbar-nav .nav-link:hover {
-      color: white; /* White color on hover */
-    }
-    .container {
-      background-color: #222; /* Darker background for the form container */
-      padding: 20px;
-      border-radius: 8px;
+      color: white;
     }
   </style>
 </head>
@@ -57,38 +52,28 @@ function generateAccountNumber($length = 10) {
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-black justify-content-center">
       <ul class="navbar-nav">
-        <li class="nav-item"><a href="index.php" class="nav-link text-light">Consumers Table</a></li>
-        <li class="nav-item"><a href="address.php" class="nav-link text-light">Addresses Table</a></li>
-        <li class="nav-item"><a href="meters.php" class="nav-link text-light">Meters Table</a></li>
-        <li class="nav-item"><a href="addconsumer.php" class="nav-link text-light active btn btn-success">Add Consumer</a></li>
+        <li class="nav-item"><a href="index.php" class="nav-link">Consumers Table</a></li>
+        <li class="nav-item"><a href="meters.php" class="nav-link">Meters Table</a></li>
+        <li class="nav-item"><a href="addconsumer.php" class="nav-link btn btn-dark active">Add Consumer</a></li>
       </ul>
     </nav>
 
     <?php
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $accountNumber = generateAccountNumber(); // Generate a random account number
+        $accountNumber = generateAccountNumber();
         $name = mysqli_real_escape_string($conn, $_POST['name']);
         $contact_details = mysqli_real_escape_string($conn, $_POST['contact_details']);
         $address = mysqli_real_escape_string($conn, $_POST['address']);
 
-        // Insert address into the addresses table first
-        $address_sql = "INSERT INTO addresses (address) VALUES ('$address')";
-        if (mysqli_query($conn, $address_sql)) {
-            // Get the ID of the newly inserted address
-            $address_id = mysqli_insert_id($conn);
+        // Insert consumer data into consumers table
+        $sql = "INSERT INTO consumers (account_number, name, contact_details, address) 
+                VALUES ('$accountNumber', '$name', '$contact_details', '$address')";
 
-            // Insert consumer data into the consumers table
-            $sql = "INSERT INTO consumers (account_number, name, contact_details) 
-                    VALUES ('$accountNumber', '$name', '$contact_details')";
-
-            if (mysqli_query($conn, $sql)) {
-                echo "<div class='alert alert-success mt-4'>Consumer added successfully!</div>";
-            } else {
-                echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
-            }
+        if (mysqli_query($conn, $sql)) {
+            echo "<div class='alert alert-success mt-4'>Consumer added successfully!</div>";
         } else {
-            echo "<div class='alert alert-danger mt-4'>Error adding address: " . mysqli_error($conn) . "</div>";
+            echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
         }
     }
     ?>

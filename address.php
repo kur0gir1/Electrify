@@ -45,7 +45,7 @@ if (isset($_SESSION['username'])) {
 <body>
   <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0" style="font-weight: 600">Electrify</h2>
+      <h2 class="mb-0" style="font-weight: 600">Electrify</h2>
       <div>
         <span class="me-3">Welcome, <?php echo $username ?: 'Guest'; ?>!</span>
         <a href="login.php" class="btn btn-outline-light">Logout</a>
@@ -64,13 +64,13 @@ if (isset($_SESSION['username'])) {
 
     <?php
     // Determine sorting order
-    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'address_id';
+    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'a.address_id';
     $order = isset($_GET['order']) && $_GET['order'] == 'asc' ? 'desc' : 'asc';
 
-    // SQL query to get addresses with consumers
+    // SQL query to get addresses with consumer details
     $sql = "SELECT a.address_id, a.consumer_id, a.address, c.name, c.account_number 
-            FROM Addresses a 
-            LEFT JOIN Consumers c ON a.consumer_id = c.consumer_id 
+            FROM addresses a 
+            LEFT JOIN consumers c ON a.consumer_id = c.consumer_id 
             ORDER BY $sort $order";
     
     $result = mysqli_query($conn, $sql);
@@ -79,11 +79,11 @@ if (isset($_SESSION['username'])) {
         echo "<table class='table mt-4'>";
         echo "<thead>";
         echo "<tr>";
-        echo "<th><a href='?sort=address_id&order=$order' class='text-light'>Address ID</a></th>";
-        echo "<th><a href='?sort=consumer_id&order=$order' class='text-light'>Consumer ID</a></th>";
-        echo "<th><a href='?sort=address&order=$order' class='text-light'>Complete Address</a></th>";
-        echo "<th><a href='?sort=name&order=$order' class='text-light'>Consumer Name</a></th>";
-        echo "<th><a href='?sort=account_number&order=$order' class='text-light'>Account Number</a></th>";
+        echo "<th><a href='?sort=a.address_id&order=$order' class='text-light'>Address ID</a></th>";
+        echo "<th><a href='?sort=a.consumer_id&order=$order' class='text-light'>Consumer ID</a></th>";
+        echo "<th><a href='?sort=a.address&order=$order' class='text-light'>Complete Address</a></th>";
+        echo "<th><a href='?sort=c.name&order=$order' class='text-light'>Consumer Name</a></th>";
+        echo "<th><a href='?sort=c.account_number&order=$order' class='text-light'>Account Number</a></th>";
         echo "<th>Actions</th>";
         echo "</tr>";
         echo "</thead>";
