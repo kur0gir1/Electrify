@@ -15,25 +15,50 @@ if (isset($_SESSION['username'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consumers Table</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+      body {
+          font-family: 'DM Sans', sans-serif;
+          background-color: black;
+          color: #FFD700;
+      }
+      .navbar {
+          background-color: black;
+      }
+      .navbar-nav .nav-link {
+          color: #FFD700;
+      }
+      .navbar-nav .nav-link.active {
+          font-weight: bold;
+      }
+      .table {
+          color: white; /* Table text color */
+      }
+      .table th, .table td {
+          border-color: #fff; /* Border color */
+      }
+  </style>
 </head>
-<body class="container-fluid bg-dark text-white">
-  <div class="container mt-5 bg-dark text-light p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="mb-0">BlockForge Labs</h2>
+<body>
+  <div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 ">
+      <h2 class="mb-0" style="font-weight: 600">Electrify</h2>
       <div>
         <span class="me-3">Welcome, <?php echo $username ?: 'Guest'; ?>!</span>
-        <a href="logout.php" class="btn btn-outline-light">Logout</a>
+        <a href="login.php" class="btn btn-outline-light">Logout</a>
       </div>
     </div>
 
     <h1 class="text-center">Consumers Table</h1>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-black justify-content-center">
+    <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
       <ul class="navbar-nav">
-        <li class="nav-item"><a href="index.php" class="nav-link text-light active">Consumers Table</a></li>
-        <li class="nav-item"><a href="address.php" class="nav-link text-light">Addresses Table</a></li>
-        <li class="nav-item"><a href="meters.php" class="nav-link text-light">Meters Table</a></li>
-        <li class="nav-item"><a href="addconsumer.php" class="nav-link text-light active btn btn-success">Add Consumer</a></li>
+        <li class="nav-item"><a href="index.php" class="nav-link active">Consumers Table</a></li>
+        <li class="nav-item"><a href="address.php" class="nav-link">Addresses Table</a></li>
+        <li class="nav-item"><a href="meters.php" class="nav-link">Meters Table</a></li>
+        <li class="nav-item"><a href="addconsumer.php" class="nav-link btn btn-dark">Add Consumer</a></li>
       </ul>
     </nav>
 
@@ -52,7 +77,7 @@ if (isset($_SESSION['username'])) {
     $result = mysqli_query($conn, $sql);
 
     if ($result && mysqli_num_rows($result) > 0) {
-        echo "<table class='table table-dark table-striped mt-4'>";
+        echo "<table class='table mt-4'>";
         echo "<thead>";
         echo "<tr>";
         echo "<th><a href='?sort=consumer_id&order=$order' class='text-light'>Consumer ID</a></th>";

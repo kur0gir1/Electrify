@@ -3,8 +3,8 @@ session_start();
 include 'database.php';
 
 // Check if employee ID is provided in the URL
-if (isset($_GET['employeeID'])) {
-    $employeeID = $_GET['employeeID'];
+if (isset($_GET['consumer_id'])) {
+    $employeeID = $_GET['consumer_id'];
 
     // Fetch the employee details from the database
     $sql = "SELECT e.*, p.GrossPay, p.Deductions, p.NetPay FROM employees e 
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h2 class="mb-0">BlockForge Labs</h2>
       <div>
         <span class="me-3">Welcome, <?php echo $username ?: 'Guest'; ?>!</span>
-        <a href="login.php" class="btn btn-outline-light">Logout</a> <!-- Change to logout.php -->
+        <a href="login.php" class="btn btn-outline-light">Logout</a>
       </div>
     </div>
     <h1 class="text-center">Edit Employee</h1>

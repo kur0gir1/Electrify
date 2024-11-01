@@ -19,11 +19,35 @@ function generateAccountNumber($length = 10) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Consumer</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: black; /* Black background for the body */
+      color: #FFD700; /* Yellow text color */
+    }
+    .navbar {
+      background-color: black; /* Black navbar */
+    }
+    .navbar-nav .nav-link {
+      color: #FFD700; /* Yellow nav links */
+    }
+    .navbar-nav .nav-link:hover {
+      color: white; /* White color on hover */
+    }
+    .container {
+      background-color: #222; /* Darker background for the form container */
+      padding: 20px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-<body class="container-fluid bg-dark text-white">
-  <div class="container mt-5 bg-dark text-light p-4 rounded">
+<body>
+  <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="mb-0">BlockForge Labs</h2>
+      <h2 class="mb-0">Electrify</h2>
       <div>
         <span class="me-3">Welcome, <?php echo $username ?: 'Guest'; ?>!</span>
         <a href="login.php" class="btn btn-outline-light">Logout</a>
@@ -45,20 +69,27 @@ function generateAccountNumber($length = 10) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $accountNumber = generateAccountNumber(); // Generate a random account number
         $name = mysqli_real_escape_string($conn, $_POST['name']);
-        $contactNumber = mysqli_real_escape_string($conn, $_POST['contact_number']);
+        $contact_details = mysqli_real_escape_string($conn, $_POST['contact_details']);
         $address = mysqli_real_escape_string($conn, $_POST['address']);
-        
-        // Insert consumer data
-        $sql = "INSERT INTO consumers (account_number, name, contact_number, address) 
-                VALUES ('$accountNumber', '$name', '$contactNumber', '$address')";
 
-        if (mysqli_query($conn, $sql)) {
-            echo "<div class='alert alert-success mt-4'>Consumer added successfully!</div>";
+        // Insert address into the addresses table first
+        $address_sql = "INSERT INTO addresses (address) VALUES ('$address')";
+        if (mysqli_query($conn, $address_sql)) {
+            // Get the ID of the newly inserted address
+            $address_id = mysqli_insert_id($conn);
+
+            // Insert consumer data into the consumers table
+            $sql = "INSERT INTO consumers (account_number, name, contact_details) 
+                    VALUES ('$accountNumber', '$name', '$contact_details')";
+
+            if (mysqli_query($conn, $sql)) {
+                echo "<div class='alert alert-success mt-4'>Consumer added successfully!</div>";
+            } else {
+                echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
+            }
         } else {
-            echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
+            echo "<div class='alert alert-danger mt-4'>Error adding address: " . mysqli_error($conn) . "</div>";
         }
-
-        mysqli_close($conn);
     }
     ?>
 
@@ -69,8 +100,8 @@ function generateAccountNumber($length = 10) {
         <input type="text" name="name" id="name" class="form-control bg-light border border-secondary" placeholder="Enter consumer's name" required>
       </div>
       <div class="mb-3">
-        <label for="contact_number" class="form-label">Contact Number:</label>
-        <input type="text" name="contact_number" id="contact_number" class="form-control bg-light border border-secondary" placeholder="Enter consumer's contact number" required>
+        <label for="contact_details" class="form-label">Contact Number:</label>
+        <input type="text" name="contact_details" id="contact_details" class="form-control bg-light border border-secondary" placeholder="Enter consumer's contact number" required>
       </div>
       <div class="mb-3">
         <label for="address" class="form-label">Address:</label>
