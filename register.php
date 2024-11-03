@@ -19,12 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (count($errors) == 0) {
+        // No encryption for the password
         $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
         $stmt = mysqli_stmt_init($conn);
         
         if (mysqli_stmt_prepare($stmt, $sql)) {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT); // Hashing the password
-            mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashed_password);
+            mysqli_stmt_bind_param($stmt, "sss", $username, $email, $password); // Use the plain password
             if (mysqli_stmt_execute($stmt)) {
                 header("Location: login.php");
                 exit();
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -67,14 +67,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-color: #FFD700;
         }
         .left-box {
-            background-color: #111; /* Keep the form background dark */
+            background-color: #111;
             color: #FFD700;
         }
         .right-box {
-            background-color: #FFD700; /* Yellow background on the right */
+            background-color: #FFD700;
             color: black;
-            border-top-right-radius: 20px; /* Match rounding */
-            border-bottom-right-radius: 20px; /* Match rounding */
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
         }
         .header-text h2, .header-text p {
             color: #FFD700;
@@ -95,6 +95,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .btn-primary:hover {
             background-color: #FFC107;
             border-color: #FFC107;
+        }
+        .btn-fixed-width {
+            width: 60px; /* Fixed width for show/hide buttons */
         }
     </style>
     <title>Register</title>
@@ -119,9 +122,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" class="form-control form-control-lg fs-6" placeholder="Password" name="password" required id="password">
+                        <button type="button" class="btn btn-outline-light btn-fixed-width" id="togglePassword">Show</button>
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" class="form-control form-control-lg fs-6" placeholder="Confirm Password" name="confirm_password" required id="confirm_password">
+                        <button type="button" class="btn btn-outline-light btn-fixed-width" id="toggleConfirmPassword">Show</button>
                     </div>
                     <div class="input-group mb-3">
                         <button type="submit" class="btn btn-lg btn-primary fs-6 w-100">Register</button>
@@ -180,9 +185,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             });
         });
+
+        // Show/Hide Password Functionality
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+
+        toggleConfirmPassword.addEventListener('click', function () {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
     });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-3Z0EXGJl8H0C1A9uNa90MfwzF1oEovb7ZRX1L7qKuxp9t+6gT6uCq3EVp8SNiJ1X" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

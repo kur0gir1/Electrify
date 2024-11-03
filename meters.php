@@ -65,102 +65,116 @@ if (isset($_SESSION['username'])) {
   </style>
 </head>
 <body>
-  <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container mt-5">
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-6">
       <h2 class="mb-0" style="font-weight: 600">Electrify</h2>
-      <div>
-        <span class="me-3">Welcome, <?php echo $username ?: 'Guest'; ?>!</span>
-        <a href="login.php" class="btn btn-outline-light">Logout</a>
-      </div>
     </div>
-
-    <h1 class="text-center">Meters Table</h1>
-
-    <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a href="index.php" class="nav-link">Consumers Table</a></li>
-        <li class="nav-item"><a href="meters.php" class="nav-link text-light active">Meters Table</a></li>
-        <li class="nav-item"><a href="addconsumer.php" class="nav-link btn btn-dark">Add Consumer</a></li>
-      </ul>
-    </nav>
-
-    <h2 class="text-center">Electricity Meters</h2>
-
-    <?php
-    // Query to retrieve meter details along with the associated consumers
-    $meterSql = "
-    SELECT 
-        em.meter_id, 
-        em.manufacture_date, 
-        em.installation_date, 
-        c.consumer_id,
-        c.account_number 
-    FROM 
-        electricitymeters em 
-    LEFT JOIN 
-        consumers c ON em.meter_id = c.meter_id
-    ";
-
-    $result = mysqli_query($conn, $meterSql);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        echo "<table class='table mt-4'>"; // Striped table
-        echo "<thead>";
-        echo "<tr>";
-        echo "<th>Meter ID</th>";
-        echo "<th>Manufacture Date</th>";
-        echo "<th>Installation Date</th>";
-        echo "<th>Account Number</th>";
-        echo "<th>Action</th>";
-        echo "</tr>";
-        echo "</thead>";
-        echo "<tbody>";
-
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
-            echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
-            echo "</tr>";
-        }
-
-        echo "</tbody>";
-        echo "</table>";
-    } else {
-        echo "<div class='alert alert-info mt-4'>No meter records found.</div>";
-    }
-
-    mysqli_close($conn);
-    ?>
-  </div>
-
-  <!-- Modal for Consumption Records -->
-  <div class="modal fade" id="consumptionModal" tabindex="-1" aria-labelledby="consumptionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="consumptionModalLabel" style="font-weight:600">Consumption Records</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <table class="table" id="consumptionTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Energy Consumed (kWh)</th>
-                <th>Payment Period</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Consumption records will be populated here -->
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="col-md-6 text-end">
+      <span class="me-3">Welcome, <?php echo $username ?: 'Guest'; ?>!</span>
+      <a href="login.php" class="btn btn-outline-light">Logout</a>
     </div>
   </div>
+
+  <h1 class="text-center mb-4">Meters Table</h1>
+
+  <nav class="navbar navbar-expand-lg navbar-dark justify-content-center mb-4">
+    <ul class="navbar-nav">
+      <li class="nav-item"><a href="index.php" class="nav-link">Consumers Table</a></li>
+      <li class="nav-item"><a href="meters.php" class="nav-link active">Meters Table</a></li>
+      <li class="nav-item"><a href="addconsumer.php" class="nav-link btn btn-dark">Add Consumer</a></li>
+    </ul>
+  </nav>
+
+  <h2 class="text-center mb-4">Electricity Meters</h2>
+
+  <?php
+  // Query to retrieve meter details along with the associated consumers
+  $meterSql = "
+  SELECT 
+      em.meter_id, 
+      em.manufacture_date, 
+      em.installation_date, 
+      c.consumer_id,
+      c.account_number 
+  FROM 
+      electricitymeters em 
+  LEFT JOIN 
+      consumers c ON em.consumer_id = c.consumer_id
+  ";
+
+  $result = mysqli_query($conn, $meterSql);
+
+  if ($result && mysqli_num_rows($result) > 0) {
+      echo "<table class='table table-responsive mt-4'>"; // Responsive striped table
+      echo "<thead>";
+      echo "<tr>";
+      echo "<th>Meter ID</th>";
+      echo "<th>Manufacture Date</th>";
+      echo "<th>Installation Date</th>";
+      echo "<th>Account Number</th>";
+      echo "<th>Action</th>";
+      echo "</tr>";
+      echo "</thead>";
+      echo "<tbody>";
+
+      while ($row = mysqli_fetch_assoc($result)) {
+          echo "<tr>";
+          echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
+          echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
+          echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
+          echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
+          echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
+          echo "</tr>";
+      }
+
+      echo "</tbody>";
+      echo "</table>";
+  } else {
+      echo "<div class='alert alert-info mt-4'>No meter records found.</div>";
+  }
+
+  mysqli_close($conn);
+  ?>
+</div>
+
+<!-- Modal for Consumption Records -->
+<div class="modal fade" id="consumptionModal" tabindex="-1" aria-labelledby="consumptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="consumptionModalLabel" style="font-weight:600">Consumption Records</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-responsive" id="consumptionTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Daily Consumption (kWh)</th>
+              <th>Weekly Consumption (kWh)</th>
+              <th>Monthly Consumption (kWh)</th>
+              <th>Price to Pay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Consumption records will be populated here -->
+          </tbody>
+        </table>
+        <div class="mb-3">
+          <label for="energyConsumed" class="form-label">Energy Consumed (kWh):</label>
+          <input type="number" class="form-control" id="energyConsumed" placeholder="Enter daily consumption" required>
+        </div>
+        <div class="mb-3">
+          <label for="date" class="form-label">Date:</label>
+          <input type="date" class="form-control" id="date" required>
+        </div>
+        <button id="addRecord" class="btn btn-info">Add Record</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
@@ -179,12 +193,60 @@ if (isset($_SESSION['username'])) {
                     // Populate the modal table with data
                     $('#consumptionTable tbody').html(response);
                     $('#consumptionModal').modal('show'); // Show the modal
+
+                    // Calculate weekly, monthly, and price
+                    calculateConsumption();
                 },
                 error: function() {
                     alert('Error fetching consumption records.');
                 }
             });
+
+            $('#addRecord').off('click').on('click', function() {
+                var energyConsumed = $('#energyConsumed').val();
+                var date = $('#date').val();
+
+                if (!energyConsumed || !date) {
+                    alert('Please enter both the energy consumed and the date.');
+                    return;
+                }
+
+                // Send request to add consumption record
+                $.ajax({
+                    url: 'add_consumption_record.php', // PHP file to handle adding records
+                    type: 'POST',
+                    data: {
+                        consumer_id: consumerId,
+                        energy_consumed: energyConsumed,
+                        date: date
+                    },
+                    success: function(response) {
+                        $('#consumptionTable tbody').html(response); // Update table with new data
+                        $('#energyConsumed').val(''); // Clear input fields
+                        $('#date').val('');
+                        calculateConsumption(); // Recalculate consumption values
+                    },
+                    error: function() {
+                        alert('Error adding consumption record.');
+                    }
+                });
+            });
         });
+
+        function calculateConsumption() {
+        $('#consumptionTable tbody tr').each(function() {
+        var dailyConsumption = parseFloat($(this).find('td:nth-child(2)').text()) || 0;
+        var weeklyConsumption = dailyConsumption * 7;
+        var monthlyConsumption = dailyConsumption * 30; // Approximation for 30 days
+        var pricePerKwh = 6; // Conversion rate: 6 pesos per kWh
+        var priceToPay = monthlyConsumption * pricePerKwh;
+
+        $(this).find('td:nth-child(3)').text(weeklyConsumption.toFixed(2));
+        $(this).find('td:nth-child(4)').text(monthlyConsumption.toFixed(2));
+        $(this).find('td:nth-child(5)').text('₱' + priceToPay.toFixed(2)); // Display price in pesos
+        });
+        }
+
     });
   </script>
 </body>

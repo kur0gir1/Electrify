@@ -2,37 +2,39 @@
 session_start();
 include 'database.php';
 
-// Check if both employeeID and payrollID are set and valid
-if (isset($_GET['consumerID']) && is_numeric($_GET['consumerID'])){
+// Check if consumerID is set and valid
+if (isset($_GET['consumer_id']) && is_numeric($_GET['consumer_id'])) {
+    $consumerID = (int)$_GET['consumer_id'];
 
-    $consumerID= (int)$_GET['consumerID'];
-
-    // SQL to delete from employees
-    $deleteEmployeesSQL = "DELETE FROM consumers WHERE consumerID = ?";
-
-    // Prepare the statement for deleting from employees
-    if ($stmt1 = mysqli_prepare($conn, $deleteEmployeesSQL)) {
+    // SQL to delete from consumption_records
+    $deleteConsumptionSQL = "DELETE FROM consumption_records WHERE consumer_id = ?";
+    
+    // Prepare the statement for deleting from consumption_records
+    if ($stmt1 = mysqli_prepare($conn, $deleteConsumptionSQL)) {
         mysqli_stmt_bind_param($stmt1, "i", $consumerID);
         mysqli_stmt_execute($stmt1);
         mysqli_stmt_close($stmt1);
     } else {
-        echo "Error preparing statement for employees: " . mysqli_error($conn);
+        echo "Error preparing statement for consumption_records: " . mysqli_error($conn);
         exit();
     }
 
-    // Prepare the statement for deleting from payroll
-    if ($stmt2 = mysqli_prepare($conn, $deletePayrollSQL)) {
-        mysqli_stmt_bind_param($stmt2, "i", $PayrollID);
+    // SQL to delete from consumers
+    $deleteConsumersSQL = "DELETE FROM consumers WHERE consumer_id = ?";
+
+    // Prepare the statement for deleting from consumers
+    if ($stmt2 = mysqli_prepare($conn, $deleteConsumersSQL)) {
+        mysqli_stmt_bind_param($stmt2, "i", $consumerID);
         mysqli_stmt_execute($stmt2);
         mysqli_stmt_close($stmt2);
+
+        // Redirect to the index page after deletion
+        header("Location: index.php?message=Consumer and associated records deleted successfully");
+        exit();
     } else {
-        echo "Error preparing statement for payroll: " . mysqli_error($conn);
+        echo "Error preparing statement for consumers: " . mysqli_error($conn);
         exit();
     }
-
-    // Redirect to the employee list page after deletion
-    header("Location: index.php?message=Employee and Payroll deleted successfully");
-    exit();
 } else {
     echo "Invalid request.";
 }

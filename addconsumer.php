@@ -8,8 +8,10 @@ if (isset($_SESSION['username'])) {
 }
 
 // Function to generate a random account number
-function generateAccountNumber($length = 10) {
-    return strtoupper(substr(bin2hex(random_bytes($length)), 0, $length));
+function generateAccountNumber() {
+  $randomNumber = random_int(0, 99999999); // Generate a random number between 0 and 99999999
+  $formattedNumber = str_pad($randomNumber, 8, '0', STR_PAD_LEFT); // Ensure it's 8 digits with leading zeros
+  return 'AC' . $formattedNumber; // Prefix with "AC"
 }
 ?>
 <!DOCTYPE html>
@@ -65,13 +67,44 @@ function generateAccountNumber($length = 10) {
         $name = mysqli_real_escape_string($conn, $_POST['name']);
         $contact_details = mysqli_real_escape_string($conn, $_POST['contact_details']);
         $address = mysqli_real_escape_string($conn, $_POST['address']);
+        $manufactureDate = date('Y-m-d');  // You may change this to accept a specific manufacture date
+        $installationDate = date('Y-m-d');  // Same here for installation date
 
         // Insert consumer data into consumers table
         $sql = "INSERT INTO consumers (account_number, name, contact_details, address) 
                 VALUES ('$accountNumber', '$name', '$contact_details', '$address')";
 
         if (mysqli_query($conn, $sql)) {
-            echo "<div class='alert alert-success mt-4'>Consumer added successfully!</div>";
+            // Get the consumer_id of the last inserted consumer
+            $consumerId = mysqli_insert_id($conn);
+
+            // Insert meter data into electricitymeters table with reference to consumer_id
+            $meterSql = "INSERT INTO electricitymeters (consumer_id, manufacture_date, installation_date) 
+                        VALUES ('$consumerId', '$manufactureDate', '$installationDate')";
+
+            if (mysqli_query($conn, $meterSql)) {
+                echo "<div class='alert alert-success mt-4'>Consumer and Meter added successfully!</div>";
+
+                // Display account number and meter details
+                $displaySql = "SELECT em.meter_id, em.manufacture_date, em.installation_date, c.account_number
+                              FROM electricitymeters em
+                              JOIN consumers c ON em.consumer_id = c.consumer_id
+                              WHERE c.consumer_id = '$consumerId'";
+
+                $result = mysqli_query($conn, $displaySql);
+                if ($result && mysqli_num_rows($result) > 0) {
+                    $row = mysqli_fetch_assoc($result);
+                    echo "<div class='mt-4'><strong>New Meter Details:</strong></div>";
+                    echo "<p>Meter ID: " . $row['meter_id'] . "</p>";
+                    echo "<p>Manufacture Date: " . $row['manufacture_date'] . "</p>";
+                    echo "<p>Installation Date: " . $row['installation_date'] . "</p>";
+                    echo "<p>Account Number: " . $row['account_number'] . "</p>";
+                } else {
+                    echo "<div class='alert alert-warning mt-4'>Unable to retrieve meter details.</div>";
+                }
+            } else {
+                echo "<div class='alert alert-danger mt-4'>Error adding meter: " . mysqli_error($conn) . "</div>";
+            }
         } else {
             echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
         }

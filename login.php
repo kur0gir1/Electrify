@@ -98,6 +98,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #FFC107;
             border-color: #FFC107;
         }
+        .toggle-password {
+            width: 70px; /* Fixed width for button */
+        }
     </style>
     <title>Login</title>
 </head>
@@ -125,6 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" class="form-control form-control-lg fs-6" placeholder="Password" name="password" required id="password">
+                        <button type="button" class="btn btn-outline-light toggle-password" id="togglePassword">Show</button>
                     </div>
                     <div class="input-group mb-5 d-flex justify-content-between">
                         <div class="form-check">
@@ -184,6 +188,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }, 500);
                 }
             });
+        });
+
+        // Show/Hide Password Functionality
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Show' : 'Hide';
         });
     });
 </script>
