@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2024 at 09:26 AM
+-- Generation Time: Nov 03, 2024 at 09:44 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,7 +69,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `terms`) VALUES
 (1, 'admin', 'admin@payrolldb.com', '12345', 1),
-(4, 'admen', 'admen@gmail.com', 'admenadmen', 1);
+(2, 'admen', 'admen@gmail.com', 'admenadmen', 1);
 
 --
 -- Indexes for dumped tables
@@ -116,7 +116,7 @@ ALTER TABLE `electricitymeters`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
