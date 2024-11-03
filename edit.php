@@ -2,33 +2,28 @@
 session_start();
 include 'database.php';
 
-// Check if consumer ID is provided in the URL
 if (isset($_GET['consumer_id'])) {
     $consumerID = $_GET['consumer_id'];
 
-    // Fetch the consumer details from the consumers table
     $sql = "SELECT consumer_id, name, account_number, contact_details, address FROM consumers WHERE consumer_id = '$consumerID'";
     $result = mysqli_query($conn, $sql);
     $consumer = mysqli_fetch_assoc($result);
 
-    // Check if consumer exists
     if (!$consumer) {
         echo "<div class='alert alert-danger'>Consumer not found.</div>";
         exit;
     }
 
-    // Fetch the meter_id directly from the electricitymeters table
-    $meterSql = "SELECT meter_id FROM electricitymeters LIMIT 1"; // Adjust the LIMIT as needed
+    $meterSql = "SELECT meter_id FROM electricitymeters LIMIT 1"; 
     $meterResult = mysqli_query($conn, $meterSql);
     $meter = mysqli_fetch_assoc($meterResult);
 
-    // Check if meter exists
     if (!$meter) {
         echo "<div class='alert alert-danger'>No meter found.</div>";
         exit;
     }
 
-    $meterID = $meter['meter_id']; // Get the meter ID
+    $meterID = $meter['meter_id'];
 } else {
     echo "<div class='alert alert-danger'>No consumer ID provided.</div>";
     exit;
@@ -36,18 +31,15 @@ if (isset($_GET['consumer_id'])) {
 
 $username = '';
 if (isset($_SESSION['username'])) {
-    $username = htmlspecialchars($_SESSION['username']); // Get the username safely
+    $username = htmlspecialchars($_SESSION['username']); 
 }
 
-// Handle form submission for updating consumer details
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Fetching data from the form input
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $accountNumber = mysqli_real_escape_string($conn, $_POST['account_number']);
     $contactDetails = mysqli_real_escape_string($conn, $_POST['contact_details']);
     $address = mysqli_real_escape_string($conn, $_POST['address']);
     
-    // Update the consumer details in the consumers table
     $sql = "UPDATE consumers SET name='$name', account_number='$accountNumber', 
             contact_details='$contactDetails', address='$address' WHERE consumer_id='$consumerID'";
 
@@ -97,7 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </ul>
         </nav>
 
-        <!-- Form to edit consumer -->
         <form action="edit.php?consumer_id=<?php echo htmlspecialchars($consumerID); ?>" method="post" class="mt-4">
             <div class="mb-3">
                 <label for="consumer_id">Consumer ID:</label>

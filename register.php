@@ -19,12 +19,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (count($errors) == 0) {
-        // No encryption for the password
         $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
         $stmt = mysqli_stmt_init($conn);
         
         if (mysqli_stmt_prepare($stmt, $sql)) {
-            mysqli_stmt_bind_param($stmt, "sss", $username, $email, $password); // Use the plain password
+            mysqli_stmt_bind_param($stmt, "sss", $username, $email, $password);
             if (mysqli_stmt_execute($stmt)) {
                 header("Location: login.php");
                 exit();
@@ -97,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-color: #FFC107;
         }
         .btn-fixed-width {
-            width: 60px; /* Fixed width for show/hide buttons */
+            width: 60px;
         }
     </style>
     <title>Register</title>
@@ -186,7 +185,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             });
         });
 
-        // Show/Hide Password Functionality
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 

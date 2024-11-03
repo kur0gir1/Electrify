@@ -4,7 +4,7 @@ include 'database.php';
 
 $username = '';
 if (isset($_SESSION['username'])) {
-    $username = htmlspecialchars($_SESSION['username']); // Get the username safely
+    $username = htmlspecialchars($_SESSION['username']); 
 }
 ?>
 
@@ -21,46 +21,46 @@ if (isset($_SESSION['username'])) {
   <style>
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: black; /* Black background for the entire body */
-      color: #FFD700; /* Yellow text color */
+      background-color: black;
+      color: #FFD700;
     }
     .navbar {
-      background-color: black; /* Black background for navbar */
+      background-color: black;
     }
     .navbar-nav .nav-link {
-      color: #FFD700; /* Yellow color for nav links */
+      color: #FFD700; 
     }
     .navbar-nav .nav-link.active {
       font-weight: bold;
     }
     .navbar-nav .nav-link:hover {
-      color: white; /* White color on hover */
+      color: white;
     }
     .table {
-      background-color: #000; /* Black background for the table */
-      color: white; /* White text color in the table */
+      background-color: #000;
+      color: white;
     }
     .table th, .table td {
-      vertical-align: middle; /* Center align table cells */
+      vertical-align: middle;
     }
     .btn-info {
-      background-color: #FFD700; /* Yellow background for info button */
-      color: black; /* Black text for button */
+      background-color: #FFD700;
+      color: black; 
       outline: none;
     }
     .btn-info:hover {
-      background-color: #e0a800; /* Darker yellow on hover */
-      color: white; /* White text on hover */
+      background-color: #e0a800; 
+      color: white; 
     }
     .modal-content {
-      background-color: #000; /* Black background for modal */
-      color: white; /* White text for modal */
+      background-color: #000; 
+      color: white; 
     }
     .modal-header, .modal-body {
-      border-color: #FFD700; /* Yellow border for modal */
+      border-color: #FFD700; 
     }
     .modal-header .btn-close {
-      filter: brightness(0) invert(1); /* Change close button color to white */
+      filter: brightness(0) invert(1);
     }
   </style>
 </head>
@@ -89,7 +89,6 @@ if (isset($_SESSION['username'])) {
   <h2 class="text-center mb-4">Electricity Meters</h2>
 
   <?php
-  // Query to retrieve meter details along with the associated consumers
   $meterSql = "
   SELECT 
       em.meter_id, 
@@ -106,7 +105,7 @@ if (isset($_SESSION['username'])) {
   $result = mysqli_query($conn, $meterSql);
 
   if ($result && mysqli_num_rows($result) > 0) {
-      echo "<table class='table table-responsive mt-4'>"; // Responsive striped table
+      echo "<table class='table table-responsive mt-4'>";
       echo "<thead>";
       echo "<tr>";
       echo "<th>Meter ID</th>";
@@ -138,7 +137,6 @@ if (isset($_SESSION['username'])) {
   ?>
 </div>
 
-<!-- Modal for Consumption Records -->
 <div class="modal fade" id="consumptionModal" tabindex="-1" aria-labelledby="consumptionModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
@@ -158,7 +156,7 @@ if (isset($_SESSION['username'])) {
             </tr>
           </thead>
           <tbody>
-            <!-- Consumption records will be populated here -->
+
           </tbody>
         </table>
         <div class="mb-3">
@@ -184,17 +182,15 @@ if (isset($_SESSION['username'])) {
         $('.view-consumption').on('click', function() {
             var consumerId = $(this).data('consumer-id');
 
-            // Fetch consumption records for the selected consumer
             $.ajax({
-                url: 'fetch_consumption_records.php', // URL of the PHP file to fetch data
+                url: 'fetch_consumption_records.php',
                 type: 'POST',
                 data: { consumer_id: consumerId },
                 success: function(response) {
-                    // Populate the modal table with data
-                    $('#consumptionTable tbody').html(response);
-                    $('#consumptionModal').modal('show'); // Show the modal
 
-                    // Calculate weekly, monthly, and price
+                    $('#consumptionTable tbody').html(response);
+                    $('#consumptionModal').modal('show');
+
                     calculateConsumption();
                 },
                 error: function() {
@@ -211,9 +207,8 @@ if (isset($_SESSION['username'])) {
                     return;
                 }
 
-                // Send request to add consumption record
                 $.ajax({
-                    url: 'add_consumption_record.php', // PHP file to handle adding records
+                    url: 'add_consumption_record.php',
                     type: 'POST',
                     data: {
                         consumer_id: consumerId,
@@ -221,10 +216,10 @@ if (isset($_SESSION['username'])) {
                         date: date
                     },
                     success: function(response) {
-                        $('#consumptionTable tbody').html(response); // Update table with new data
-                        $('#energyConsumed').val(''); // Clear input fields
+                        $('#consumptionTable tbody').html(response); 
+                        $('#energyConsumed').val(''); 
                         $('#date').val('');
-                        calculateConsumption(); // Recalculate consumption values
+                        calculateConsumption();
                     },
                     error: function() {
                         alert('Error adding consumption record.');
@@ -237,13 +232,13 @@ if (isset($_SESSION['username'])) {
         $('#consumptionTable tbody tr').each(function() {
         var dailyConsumption = parseFloat($(this).find('td:nth-child(2)').text()) || 0;
         var weeklyConsumption = dailyConsumption * 7;
-        var monthlyConsumption = dailyConsumption * 30; // Approximation for 30 days
-        var pricePerKwh = 6; // Conversion rate: 6 pesos per kWh
+        var monthlyConsumption = dailyConsumption * 30; 
+        var pricePerKwh = 6;
         var priceToPay = monthlyConsumption * pricePerKwh;
 
         $(this).find('td:nth-child(3)').text(weeklyConsumption.toFixed(2));
         $(this).find('td:nth-child(4)').text(monthlyConsumption.toFixed(2));
-        $(this).find('td:nth-child(5)').text('₱' + priceToPay.toFixed(2)); // Display price in pesos
+        $(this).find('td:nth-child(5)').text('₱' + priceToPay.toFixed(2));
         });
         }
 

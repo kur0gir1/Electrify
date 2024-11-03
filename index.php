@@ -4,7 +4,7 @@ include 'database.php';
 
 $username = '';
 if (isset($_SESSION['username'])) {
-    $username = htmlspecialchars($_SESSION['username']); // Get the username safely
+    $username = htmlspecialchars($_SESSION['username']);
 }
 ?>
 
@@ -34,10 +34,10 @@ if (isset($_SESSION['username'])) {
           font-weight: bold;
       }
       .table {
-          color: white; /* Table text color */
+          color: white;
       }
       .table th, .table td {
-          border-color: #fff; /* Border color */
+          border-color: #fff;
       }
   </style>
 </head>
@@ -62,24 +62,22 @@ if (isset($_SESSION['username'])) {
     </nav>
 
     <?php
-    // Query to fetch consumers along with associated meter_id
     $sql = "SELECT c.consumer_id, c.name, c.account_number, c.contact_details, c.address, 
-                   e.meter_id 
+                  e.meter_id 
             FROM Consumers c 
             LEFT JOIN electricitymeters e ON c.consumer_id = e.consumer_id
-            ORDER BY c.consumer_id"; // Default sort order
+            ORDER BY c.consumer_id";
 
-    // Determine sorting order
     if (isset($_GET['sort'])) {
         $sort = htmlspecialchars($_GET['sort']);
         $order = isset($_GET['order']) && $_GET['order'] == 'asc' ? 'desc' : 'asc';
         $sql = "SELECT c.consumer_id, c.name, c.account_number, c.contact_details, c.address, 
-                       e.meter_id 
+                      e.meter_id 
                 FROM Consumers c 
                 LEFT JOIN electricitymeters e ON c.consumer_id = e.consumer_id 
                 ORDER BY $sort $order";
     } else {
-        $order = 'asc'; // Default to ascending
+        $order = 'asc';
     }
 
     $result = mysqli_query($conn, $sql);
@@ -93,7 +91,7 @@ if (isset($_SESSION['username'])) {
         echo "<th><a href='?sort=account_number&order=$order' class='text-light'>Account Number</a></th>";
         echo "<th><a href='?sort=contact_details&order=$order' class='text-light'>Contact Details</a></th>";
         echo "<th><a href='?sort=address&order=$order' class='text-light'>Address</a></th>";
-        echo "<th>Meter ID</th>"; // Display Meter ID without sorting
+        echo "<th>Meter ID</th>";
         echo "<th>Actions</th>";
         echo "</tr>";
         echo "</thead>";
@@ -106,7 +104,7 @@ if (isset($_SESSION['username'])) {
             echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
             echo "<td>" . htmlspecialchars($row['contact_details']) . "</td>";
             echo "<td>" . htmlspecialchars($row['address']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['meter_id'] ?? 'N/A') . "</td>"; // Display Meter ID
+            echo "<td>" . htmlspecialchars($row['meter_id'] ?? 'N/A') . "</td>";
             echo "<td>
                     <a href='edit.php?consumer_id=" . htmlspecialchars($row['consumer_id']) . "' class='btn btn-warning btn-sm'>Edit</a>
                     <a href='delete.php?consumer_id=" . htmlspecialchars($row['consumer_id']) . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this record?\");'>Delete</a>

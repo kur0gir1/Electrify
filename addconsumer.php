@@ -4,14 +4,13 @@ include 'database.php';
 
 $username = '';
 if (isset($_SESSION['username'])) {
-    $username = htmlspecialchars($_SESSION['username']); // Get the username safely
+    $username = htmlspecialchars($_SESSION['username']); 
 }
 
-// Function to generate a random account number
 function generateAccountNumber() {
-  $randomNumber = random_int(0, 99999999); // Generate a random number between 0 and 99999999
-  $formattedNumber = str_pad($randomNumber, 8, '0', STR_PAD_LEFT); // Ensure it's 8 digits with leading zeros
-  return 'AC' . $formattedNumber; // Prefix with "AC"
+  $randomNumber = random_int(0, 99999999);
+  $formattedNumber = str_pad($randomNumber, 8, '0', STR_PAD_LEFT); 
+  return 'AC' . $formattedNumber; 
 }
 ?>
 <!DOCTYPE html>
@@ -61,31 +60,27 @@ function generateAccountNumber() {
     </nav>
 
     <?php
-    // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $accountNumber = generateAccountNumber();
         $name = mysqli_real_escape_string($conn, $_POST['name']);
         $contact_details = mysqli_real_escape_string($conn, $_POST['contact_details']);
         $address = mysqli_real_escape_string($conn, $_POST['address']);
-        $manufactureDate = date('Y-m-d');  // You may change this to accept a specific manufacture date
-        $installationDate = date('Y-m-d');  // Same here for installation date
+        $manufactureDate = date('Y-m-d'); 
+        $installationDate = date('Y-m-d');  
 
-        // Insert consumer data into consumers table
         $sql = "INSERT INTO consumers (account_number, name, contact_details, address) 
                 VALUES ('$accountNumber', '$name', '$contact_details', '$address')";
 
         if (mysqli_query($conn, $sql)) {
-            // Get the consumer_id of the last inserted consumer
+
             $consumerId = mysqli_insert_id($conn);
 
-            // Insert meter data into electricitymeters table with reference to consumer_id
             $meterSql = "INSERT INTO electricitymeters (consumer_id, manufacture_date, installation_date) 
                         VALUES ('$consumerId', '$manufactureDate', '$installationDate')";
 
             if (mysqli_query($conn, $meterSql)) {
                 echo "<div class='alert alert-success mt-4'>Consumer and Meter added successfully!</div>";
 
-                // Display account number and meter details
                 $displaySql = "SELECT em.meter_id, em.manufacture_date, em.installation_date, c.account_number
                               FROM electricitymeters em
                               JOIN consumers c ON em.consumer_id = c.consumer_id
@@ -111,7 +106,6 @@ function generateAccountNumber() {
     }
     ?>
 
-    <!-- Form to add consumer -->
     <form action="addconsumer.php" method="post" class="mt-4">
       <div class="mb-3">
         <label for="name" class="form-label">Name:</label>

@@ -99,8 +99,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-color: #FFC107;
         }
         .toggle-password {
-            width: 70px; /* Fixed width for button */
+            width: 70px; 
         }
+
     </style>
     <title>Login</title>
 </head>
@@ -190,7 +191,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             });
         });
 
-        // Show/Hide Password Functionality
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
