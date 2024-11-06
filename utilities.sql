@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2024 at 09:44 AM
+-- Generation Time: Nov 06, 2024 at 04:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,6 +34,19 @@ CREATE TABLE `consumers` (
   `account_number` varchar(50) NOT NULL,
   `contact_details` varchar(50) DEFAULT NULL,
   `address` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `consumption_records`
+--
+
+CREATE TABLE `consumption_records` (
+  `record_id` int(11) NOT NULL,
+  `consumer_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `energy_consumed` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -84,6 +97,13 @@ ALTER TABLE `consumers`
   ADD KEY `meter_id` (`meter_id`) USING BTREE;
 
 --
+-- Indexes for table `consumption_records`
+--
+ALTER TABLE `consumption_records`
+  ADD PRIMARY KEY (`record_id`),
+  ADD KEY `consumer_id` (`consumer_id`);
+
+--
 -- Indexes for table `electricitymeters`
 --
 ALTER TABLE `electricitymeters`
@@ -107,6 +127,12 @@ ALTER TABLE `consumers`
   MODIFY `consumer_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `consumption_records`
+--
+ALTER TABLE `consumption_records`
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `electricitymeters`
 --
 ALTER TABLE `electricitymeters`
@@ -128,6 +154,12 @@ ALTER TABLE `users`
 ALTER TABLE `consumers`
   ADD CONSTRAINT `consumers_ibfk_1` FOREIGN KEY (`meter_id`) REFERENCES `electricitymeters` (`meter_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_meter` FOREIGN KEY (`meter_id`) REFERENCES `electricitymeters` (`meter_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `consumption_records`
+--
+ALTER TABLE `consumption_records`
+  ADD CONSTRAINT `consumption_records_ibfk_1` FOREIGN KEY (`consumer_id`) REFERENCES `consumers` (`consumer_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `electricitymeters`
