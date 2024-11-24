@@ -43,15 +43,38 @@ if (isset($_SESSION['username'])) {
     .table th, .table td {
       vertical-align: middle;
     }
-    .btn-info {
-      background-color: #FFD700;
-      color: black; 
-      outline: none;
+
+    /* Buttons Styling */
+    .btn-info.view-consumption {
+        background-color: #FFD700; /* Bright Yellow */
+        color: black;
+        border: 1px solid #FFD700;
     }
-    .btn-info:hover {
-      background-color: #e0a800; 
-      color: white; 
+
+    .btn-info.view-consumption:hover {
+        background-color: #e0a800; /* Slightly darker yellow */
+        color: white;
+        border-color: #e0a800;
     }
+
+    .btn-info.print-monthly-pay {
+        background-color: #FFD700; /* Bright Yellow */
+        color: black;
+        border: 1px solid #FFD700;
+    }
+
+    .btn-info.print-monthly-pay:hover {
+        background-color: #e0a800; /* Slightly darker yellow */
+        color: white;
+        border-color: #e0a800;
+    }
+
+    /* Table Row Styling */
+    .table tbody tr:hover {
+        background-color: #333; /* Dark gray */
+        transition: background-color 0.3s ease;
+    }
+
     .modal-content {
       background-color: #000; 
       color: white; 
@@ -119,11 +142,13 @@ if (isset($_SESSION['username'])) {
 
       while ($row = mysqli_fetch_assoc($result)) {
           echo "<tr>";
-          echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
-          echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
-          echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
-          echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
-          echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
+            echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
+            echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
+            echo "<td><button class='btn btn-info print-monthly-pay' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>Print Monthly Pay</button></td>";
+            
           echo "</tr>";
       }
 
@@ -243,6 +268,33 @@ if (isset($_SESSION['username'])) {
         }
 
     });
-  </script>
+
+    $(document).ready(function() {
+        $('.print-monthly-pay').on('click', function() {
+            var consumerId = $(this).data('consumer-id');
+
+            $.ajax({
+                url: 'fetch_monthly_pay.php',
+                type: 'POST',
+                data: { consumer_id: consumerId },
+                success: function(response) {
+                    var printWindow = window.open('', '_blank', 'width=800,height=600');
+                    printWindow.document.open();
+                    printWindow.document.write('<html><head><title>Monthly Pay Receipt</title>');
+                    printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">');
+                    printWindow.document.write('</head><body>');
+                    printWindow.document.write('<div class="container mt-4">' + response + '</div>');
+                    printWindow.document.write('</body></html>');
+                    printWindow.document.close();
+                    printWindow.print();
+                },
+                error: function() {
+                    alert('Error fetching monthly pay details.');
+                }
+            });
+        });
+    });
+
+</script>
 </body>
 </html>
