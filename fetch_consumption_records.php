@@ -5,8 +5,9 @@ include 'database.php';
 if (isset($_POST['consumer_id'])) {
     $consumerId = intval($_POST['consumer_id']);
 
-    $sql = "SELECT date, energy_consumed FROM consumption_records WHERE consumer_id = ?";
-    
+    // Modify the SQL to order by date
+    $sql = "SELECT date, energy_consumed FROM consumption_records WHERE consumer_id = ? ORDER BY date ASC";  // Or use DESC for reverse order
+
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("i", $consumerId);
         $stmt->execute();

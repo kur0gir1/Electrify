@@ -13,21 +13,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (count($errors) == 0) {
-        $sql = "SELECT * FROM users WHERE email = ? OR username = ?";
+        // Adjusted SQL query to select the same columns from both tables
+        $sql = "SELECT user_id, email, username, password, role FROM users WHERE email = ? OR username = ? 
+        UNION
+        SELECT consumer_id AS user_id, email AS email, username, password, 'consumer' AS role FROM consumers WHERE email = ? OR username = ?";
+
+
         $stmt = mysqli_stmt_init($conn);
         
         if (mysqli_stmt_prepare($stmt, $sql)) {
-            mysqli_stmt_bind_param($stmt, "ss", $loginIdentifier, $loginIdentifier);
+            mysqli_stmt_bind_param($stmt, "ssss", $loginIdentifier, $loginIdentifier, $loginIdentifier, $loginIdentifier);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
 
             if (mysqli_num_rows($result) > 0) {
                 $user = mysqli_fetch_assoc($result);
 
+                // Check if the password matches
                 if ($password === $user['password']) { 
-                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['email'] = $user['email'];
                     $_SESSION['username'] = $user['username']; 
-                    header("Location: index.php");
+                    $_SESSION['role'] = $user['role'];  // Role is now set for both users and consumers
+                    
+                    // Redirect based on the role
+                    if ($user['role'] === 'admin') {
+                        header("Location: index.php");  // Redirect to admin dashboard
+                    } else {
+                        header("Location: consumer.php");  // Redirect to consumer dashboard
+                    }
                     exit();
                 } else {
                     array_push($errors, "Incorrect password");
@@ -101,7 +114,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .toggle-password {
             width: 70px; 
         }
-
     </style>
     <title>Login</title>
 </head>

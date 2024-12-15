@@ -12,7 +12,67 @@ function generateAccountNumber() {
   $formattedNumber = str_pad($randomNumber, 8, '0', STR_PAD_LEFT); 
   return 'AC' . $formattedNumber; 
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $accountNumber = generateAccountNumber();
+    $firstName = mysqli_real_escape_string($conn, $_POST['first_name']);
+    $lastName = mysqli_real_escape_string($conn, $_POST['last_name']);
+    $contact_details = mysqli_real_escape_string($conn, $_POST['contact_details']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);  // Email field
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $manufactureDate = date('Y-m-d'); 
+    $installationDate = date('Y-m-d');  
+
+    // Combine first name and last name for full name
+    $name = $firstName . ' ' . $lastName;
+
+    // Generate username and password
+    $username = mysqli_real_escape_string($conn, strtolower(str_replace(' ', '', $firstName)) . substr($accountNumber, 2, 4));
+    $password = $accountNumber; // Default password is the account number
+
+    // Insert consumer data into consumers table, including email
+    $sql = "INSERT INTO consumers (account_number, first_name, last_name, contact_details, email, address, username, password) 
+    VALUES ('$accountNumber', '$firstName', '$lastName', '$contact_details', '$email', '$address', '$username', '$password')";
+
+    if (mysqli_query($conn, $sql)) {
+        $consumerId = mysqli_insert_id($conn);
+
+        // Insert meter data into electricitymeters table
+        $meterSql = "INSERT INTO electricitymeters (consumer_id, manufacture_date, installation_date) 
+                    VALUES ('$consumerId', '$manufactureDate', '$installationDate')";
+
+        if (mysqli_query($conn, $meterSql)) {
+            echo "<div class='alert alert-success mt-4'>Consumer and Meter added successfully!</div>";
+
+            // Retrieve and display new consumer and meter details
+            $displaySql = "SELECT em.meter_id, em.manufacture_date, em.installation_date, c.account_number, c.username, c.password, c.email
+                          FROM electricitymeters em
+                          JOIN consumers c ON em.consumer_id = c.consumer_id
+                          WHERE c.consumer_id = '$consumerId'";
+
+            $result = mysqli_query($conn, $displaySql);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                echo "<div class='mt-4'><strong>New Consumer Details:</strong></div>";
+                echo "<p><strong>Meter ID: </strong>" . $row['meter_id'] . "</p>";
+                echo "<p><strong>Manufacture Date: </strong>" . $row['manufacture_date'] . "</p>";
+                echo "<p><strong>Installation Date: </strong>" . $row['installation_date'] . "</p>";
+                echo "<p><strong>Account Number: </strong>" . $row['account_number'] . "</p>";
+                echo "<p><strong>Username:</strong> " . $row['username'] . "</p>";
+                echo "<p><strong>Default Password:</strong> " . $row['password'] . "</p>";
+                echo "<p><strong>Email:</strong> " . $row['email'] . "</p>";  // Display the email
+            } else {
+                echo "<div class='alert alert-warning mt-4'>Unable to retrieve consumer details.</div>";
+            }
+        } else {
+            echo "<div class='alert alert-danger mt-4'>Error adding meter: " . mysqli_error($conn) . "</div>";
+        }
+    } else {
+        echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,62 +119,30 @@ function generateAccountNumber() {
       </ul>
     </nav>
 
-    <?php
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $accountNumber = generateAccountNumber();
-        $name = mysqli_real_escape_string($conn, $_POST['name']);
-        $contact_details = mysqli_real_escape_string($conn, $_POST['contact_details']);
-        $address = mysqli_real_escape_string($conn, $_POST['address']);
-        $manufactureDate = date('Y-m-d'); 
-        $installationDate = date('Y-m-d');  
-
-        $sql = "INSERT INTO consumers (account_number, name, contact_details, address) 
-                VALUES ('$accountNumber', '$name', '$contact_details', '$address')";
-
-        if (mysqli_query($conn, $sql)) {
-
-            $consumerId = mysqli_insert_id($conn);
-
-            $meterSql = "INSERT INTO electricitymeters (consumer_id, manufacture_date, installation_date) 
-                        VALUES ('$consumerId', '$manufactureDate', '$installationDate')";
-
-            if (mysqli_query($conn, $meterSql)) {
-                echo "<div class='alert alert-success mt-4'>Consumer and Meter added successfully!</div>";
-
-                $displaySql = "SELECT em.meter_id, em.manufacture_date, em.installation_date, c.account_number
-                              FROM electricitymeters em
-                              JOIN consumers c ON em.consumer_id = c.consumer_id
-                              WHERE c.consumer_id = '$consumerId'";
-
-                $result = mysqli_query($conn, $displaySql);
-                if ($result && mysqli_num_rows($result) > 0) {
-                    $row = mysqli_fetch_assoc($result);
-                    echo "<div class='mt-4'><strong>New Meter Details:</strong></div>";
-                    echo "<p>Meter ID: " . $row['meter_id'] . "</p>";
-                    echo "<p>Manufacture Date: " . $row['manufacture_date'] . "</p>";
-                    echo "<p>Installation Date: " . $row['installation_date'] . "</p>";
-                    echo "<p>Account Number: " . $row['account_number'] . "</p>";
-                } else {
-                    echo "<div class='alert alert-warning mt-4'>Unable to retrieve meter details.</div>";
-                }
-            } else {
-                echo "<div class='alert alert-danger mt-4'>Error adding meter: " . mysqli_error($conn) . "</div>";
-            }
-        } else {
-            echo "<div class='alert alert-danger mt-4'>Error adding consumer: " . mysqli_error($conn) . "</div>";
-        }
-    }
-    ?>
-
     <form action="addconsumer.php" method="post" class="mt-4">
-      <div class="mb-3">
-        <label for="name" class="form-label">Name:</label>
-        <input type="text" name="name" id="name" class="form-control bg-light border border-secondary" placeholder="Enter consumer's name" required>
+    <div class="mb-3 row">
+      <div class="col-md-6">
+        <label for="first_name" class="form-label">First Name:</label>
+          <input type="text" name="first_name" id="first_name" class="form-control bg-light border border-secondary" placeholder="Enter consumer's first name" required>
       </div>
-      <div class="mb-3">
+      <div class="col-md-6">
+        <label for="last_name" class="form-label">Last Name:</label>
+          <input type="text" name="last_name" id="last_name" class="form-control bg-light border border-secondary" placeholder="Enter consumer's last name" required>
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <div class="col-md-6">
         <label for="contact_details" class="form-label">Contact Number:</label>
         <input type="text" name="contact_details" id="contact_details" class="form-control bg-light border border-secondary" placeholder="Enter consumer's contact number" required>
       </div>
+
+      <div class="col-md-6">
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" name="email" id="email" class="form-control bg-light border border-secondary" placeholder="Enter consumer's email" required>
+      </div>
+    </div>
+
       <div class="mb-3">
         <label for="address" class="form-label">Address:</label>
         <input type="text" name="address" id="address" class="form-control bg-light border border-secondary" placeholder="Enter consumer's address" required>
