@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['consumer_id'])) {
     // Updated SQL query to fetch the most recent record for the current month
     $sql = "
         SELECT 
-            c.account_umber, 
+            c.account_number, 
             c.name, 
             em.meter_id,
             dc.energy_consumed AS recent_consumption,
