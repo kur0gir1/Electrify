@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 06, 2024 at 04:10 PM
+-- Generation Time: Dec 15, 2024 at 01:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,11 +30,25 @@ SET time_zone = "+00:00";
 CREATE TABLE `consumers` (
   `consumer_id` int(11) NOT NULL,
   `meter_id` int(11) DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
   `account_number` varchar(50) NOT NULL,
+  `email` varchar(255) NOT NULL,
   `contact_details` varchar(50) DEFAULT NULL,
-  `address` text NOT NULL
+  `address` text NOT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `role` enum('admin','consumer') DEFAULT 'consumer'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `consumers`
+--
+
+INSERT INTO `consumers` (`consumer_id`, `meter_id`, `first_name`, `last_name`, `account_number`, `email`, `contact_details`, `address`, `username`, `password`, `role`) VALUES
+(1, NULL, 'Gilbert', 'Lerion', 'AC75003020', '12312321@gmail.com', '12323213', 'Bacolod City', 'gilbert7500', '111222', 'consumer'),
+(2, NULL, 'Nye', 'Nye', 'AC66184876', 'gilbert.lerion@lccbonline.edu.ph', '09232323', 'Bacolod City', 'nye6618', '123', 'consumer'),
+(3, NULL, 'testing', 'test', 'AC98966100', '12312321@gmail.com', 'sksksk', 'Baculod', 'testing9896', 'AC98966100', 'consumer');
 
 -- --------------------------------------------------------
 
@@ -46,8 +60,24 @@ CREATE TABLE `consumption_records` (
   `record_id` int(11) NOT NULL,
   `consumer_id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `energy_consumed` decimal(10,2) NOT NULL
+  `energy_consumed` decimal(10,2) NOT NULL,
+  `status` enum('Completed','Pending','Failed','Overdue') NOT NULL DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `consumption_records`
+--
+
+INSERT INTO `consumption_records` (`record_id`, `consumer_id`, `date`, `energy_consumed`, `status`) VALUES
+(1, 1, '2024-12-16', 44.00, 'Completed'),
+(2, 1, '2025-01-02', 43.00, 'Overdue'),
+(3, 1, '2024-12-05', 231.00, 'Pending'),
+(4, 2, '2024-12-21', 32.00, 'Failed'),
+(5, 2, '2024-12-28', 321.00, 'Pending'),
+(6, 1, '2024-12-17', 222.00, 'Completed'),
+(7, 1, '2024-11-19', 32.00, 'Failed'),
+(8, 2, '2024-11-06', 3.00, 'Completed'),
+(9, 2, '2024-10-15', 1.00, 'Overdue');
 
 -- --------------------------------------------------------
 
@@ -62,6 +92,15 @@ CREATE TABLE `electricitymeters` (
   `consumer_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `electricitymeters`
+--
+
+INSERT INTO `electricitymeters` (`meter_id`, `manufacture_date`, `installation_date`, `consumer_id`) VALUES
+(1, '2024-12-15', '2024-12-15', 1),
+(2, '2024-12-15', '2024-12-15', 2),
+(3, '2024-12-15', '2024-12-15', 3);
+
 -- --------------------------------------------------------
 
 --
@@ -73,6 +112,7 @@ CREATE TABLE `users` (
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `role` enum('consumer','admin') NOT NULL DEFAULT 'consumer',
   `terms` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -80,9 +120,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `terms`) VALUES
-(1, 'admin', 'admin@payrolldb.com', '12345', 1),
-(2, 'admen', 'admen@gmail.com', 'admenadmen', 1);
+INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `role`, `terms`) VALUES
+(1, 'admin', 'admin@payrolldb.com', '12345', 'admin', 1),
+(2, 'admen', 'admen@gmail.com', 'admenadmen', 'admin', 1);
 
 --
 -- Indexes for dumped tables
@@ -114,7 +154,8 @@ ALTER TABLE `electricitymeters`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -124,19 +165,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `consumers`
 --
 ALTER TABLE `consumers`
-  MODIFY `consumer_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `consumer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `consumption_records`
 --
 ALTER TABLE `consumption_records`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `electricitymeters`
 --
 ALTER TABLE `electricitymeters`
-  MODIFY `meter_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `meter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
