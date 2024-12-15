@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['consumer_id'])) {
             c.name, 
             em.meter_id,
             dc.energy_consumed AS recent_consumption,
-            (dc.energy_consmed * 6) AS monthly_consumption,
+            (dc.energy_consumed * 6) AS monthly_consumption,
             (dc.energy_consumed * 30 * 6) AS total_pay,
             dc.date AS bill_date
         FROM 
