@@ -113,48 +113,86 @@ if (isset($_SESSION['username'])) {
 
   <?php
   $meterSql = "
-  SELECT 
-      em.meter_id, 
-      em.manufacture_date, 
-      em.installation_date, 
-      c.consumer_id,
-      c.account_number 
-  FROM 
-      electricitymeters em 
-  LEFT JOIN 
-      consumers c ON em.consumer_id = c.consumer_id
+SELECT 
+    em.meter_id, 
+    em.manufacture_date, 
+    em.installation_date,
+    cr.status, 
+    cr.record_id,
+    c.consumer_id,
+    c.account_number 
+FROM 
+    electricitymeters em 
+LEFT JOIN 
+    consumers c ON em.consumer_id = c.consumer_id
+LEFT JOIN 
+    consumption_records cr ON cr.consumer_id = c.consumer_id
   ";
 
   $result = mysqli_query($conn, $meterSql);
 
   if ($result && mysqli_num_rows($result) > 0) {
-      echo "<table class='table table-responsive mt-4'>";
-      echo "<thead>";
-      echo "<tr>";
-      echo "<th>Meter ID</th>";
-      echo "<th>Manufacture Date</th>";
-      echo "<th>Installation Date</th>";
-      echo "<th>Account Number</th>";
-      echo "<th>Action</th>";
-      echo "</tr>";
-      echo "</thead>";
-      echo "<tbody>";
+    echo "<table class='table table-responsive mt-4'>";
+    echo "<thead>";
+    echo "<tr>";
+    echo "<th>Record ID ID</th>";
+    echo "<th>Meter ID</th>";
+    echo "<th>Manufacture Date</th>";
+    echo "<th>Installation Date</th>";
+    echo "<th>Account Number</th>";
+    echo "<th>Status</th>";
+    echo "<th>Action</th>";
+    echo "</tr>";
+    echo "</thead>";
+    echo "<tbody>";
 
-      while ($row = mysqli_fetch_assoc($result)) {
-          echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
-            echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
-            echo "<td><button class='btn btn-info print-monthly-pay' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>Print Monthly Pay</button></td>";
-            
-          echo "</tr>";
-      }
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Set the background color based on the status value
+        $statusColor = '';
+        switch ($row['status']) {
+            case 'Completed':
+                $statusColor = 'background-color: green; color: white;';
+                break;
+            case 'Pending':
+                $statusColor = 'background-color: yellow; color: black;';
+                break;
+            case 'Failed':
+                $statusColor = 'background-color: red; color: white;';
+                break;
+            case 'Overdue':
+                $statusColor = 'background-color: orange; color: white;';
+                break;
+            default:
+                $statusColor = 'background-color: gray; color: white;';
+                break;
+        }
 
-      echo "</tbody>";
-      echo "</table>";
-  } else {
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($row['record_id']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['meter_id']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['manufacture_date']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['installation_date']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['account_number']) . "</td>";
+        
+        // Create a dropdown for the status with color
+        echo "<td>";
+        echo "<select class='form-select status-dropdown' data-record-id='" . htmlspecialchars($row['record_id']) . "' style='$statusColor'>";
+        echo "<option value='completed' " . ($row['status'] == 'Completed' ? 'selected' : '') . ">Completed</option>";
+        echo "<option value='pending' " . ($row['status'] == 'Pending' ? 'selected' : '') . ">Pending</option>";
+        echo "<option value='failed' " . ($row['status'] == 'Failed' ? 'selected' : '') . ">Failed</option>";
+        echo "<option value='overdue' " . ($row['status'] == 'Overdue' ? 'selected' : '') . ">Overdue</option>";
+        echo "</select>";
+        echo "</td>";
+
+        echo "<td><button class='btn btn-info view-consumption' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>View Consumption Records</button></td>";
+        echo "<td><button class='btn btn-info print-monthly-pay' data-consumer-id='" . htmlspecialchars($row['consumer_id']) . "'>Print Monthly Pay</button></td>";
+        
+        echo "</tr>";
+    }
+
+    echo "</tbody>";
+    echo "</table>";
+} else {
       echo "<div class='alert alert-info mt-4'>No meter records found.</div>";
   }
 
@@ -185,7 +223,7 @@ if (isset($_SESSION['username'])) {
           </tbody>
         </table>
         <div class="mb-3">
-          <label for="energyConsumed" class="form-label">Energy Consumed (kWh):</label>
+          <label for="energyConsumed" class="form-label">Energy Consumed Daily (kWh):</label>
           <input type="number" class="form-control" id="energyConsumed" placeholder="Enter daily consumption" required>
         </div>
         <div class="mb-3">
@@ -331,6 +369,31 @@ if (isset($_SESSION['username'])) {
             },
             error: function () {
                 alert('Error fetching monthly pay details.');
+            }
+        });
+    });
+});
+
+$(document).ready(function() {
+    // Event listener for changes in the status dropdown
+    $(".status-dropdown").change(function() {
+        var recordId = $(this).data('record-id'); // Get the record_id from the data attribute
+        var newStatus = $(this).val(); // Get the new status value
+
+        // Send an AJAX request to update the status
+        $.ajax({
+            url: 'update_status.php', // The PHP file that will handle the update
+            type: 'POST',
+            data: {
+                record_id: recordId, // Use the correct record_id variable
+                status: newStatus
+            },
+            success: function(response) {
+                alert(response); // Show a message indicating success or failure
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                alert("Error updating status: " + error);
             }
         });
     });

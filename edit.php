@@ -5,7 +5,7 @@ include 'database.php';
 if (isset($_GET['consumer_id'])) {
     $consumerID = $_GET['consumer_id'];
 
-    $sql = "SELECT consumer_id, name, account_number, contact_details, address FROM consumers WHERE consumer_id = '$consumerID'";
+    $sql = "SELECT consumer_id, first_name, last_name, account_number, contact_details, address FROM consumers WHERE consumer_id = '$consumerID'";
     $result = mysqli_query($conn, $sql);
     $consumer = mysqli_fetch_assoc($result);
 
@@ -35,12 +35,13 @@ if (isset($_SESSION['username'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $firstName = mysqli_real_escape_string($conn, $_POST['first_name']);
+    $lastName = mysqli_real_escape_string($conn, $_POST['last_name']);
     $accountNumber = mysqli_real_escape_string($conn, $_POST['account_number']);
     $contactDetails = mysqli_real_escape_string($conn, $_POST['contact_details']);
     $address = mysqli_real_escape_string($conn, $_POST['address']);
     
-    $sql = "UPDATE consumers SET name='$name', account_number='$accountNumber', 
+    $sql = "UPDATE consumers SET first_name='$firstName', last_name='$lastName', account_number='$accountNumber', 
             contact_details='$contactDetails', address='$address' WHERE consumer_id='$consumerID'";
 
     if (mysqli_query($conn, $sql)) {
@@ -99,8 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" name="meter_id" id="meter_id" class="form-control bg-light border border-secondary" value="<?php echo htmlspecialchars($meterID); ?>" readonly required>
             </div>
             <div class="mb-3">
-                <label for="name">Name:</label>
-                <input type="text" name="name" id="name" class="form-control bg-light border border-secondary" value="<?php echo htmlspecialchars($consumer['name']); ?>" required>
+                <label for="first_name">First Name:</label>
+                <input type="text" name="first_name" id="first_name" class="form-control bg-light border border-secondary" value="<?php echo htmlspecialchars($consumer['first_name']); ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="last_name">Last Name:</label>
+                <input type="text" name="last_name" id="last_name" class="form-control bg-light border border-secondary" value="<?php echo htmlspecialchars($consumer['last_name']); ?>" required>
             </div>
             <div class="mb-3">
                 <label for="account_number">Account Number:</label>

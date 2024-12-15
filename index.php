@@ -68,7 +68,7 @@ if (isset($_SESSION['username'])) {
     </nav>
 
     <?php
-    $sql = "SELECT c.consumer_id, c.name, c.account_number, c.contact_details, c.address, 
+    $sql = "SELECT c.consumer_id, CONCAT(c.first_name, ' ', c.last_name) AS name, c.account_number, c.contact_details, c.address, 
                   e.meter_id 
             FROM Consumers c 
             LEFT JOIN electricitymeters e ON c.consumer_id = e.consumer_id
@@ -77,7 +77,7 @@ if (isset($_SESSION['username'])) {
     if (isset($_GET['sort'])) {
         $sort = htmlspecialchars($_GET['sort']);
         $order = isset($_GET['order']) && $_GET['order'] == 'asc' ? 'desc' : 'asc';
-        $sql = "SELECT c.consumer_id, c.name, c.account_number, c.contact_details, c.address, 
+        $sql = "SELECT c.consumer_id, CONCAT(c.first_name, ' ', c.last_name) AS name, c.account_number, c.contact_details, c.address, 
                       e.meter_id 
                 FROM Consumers c 
                 LEFT JOIN electricitymeters e ON c.consumer_id = e.consumer_id 
