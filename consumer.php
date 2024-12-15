@@ -194,27 +194,28 @@ mysqli_close($conn);
         <p><strong>Account Number:</strong> <?php echo $accountNumber; ?></p>
 
         <h4>Current Month's Bill:</h4>
-<table class="table table-striped table-dark">
-    <tbody>
-        <tr>
-            <td><strong>Date:</strong></td>
-            <td><?php echo $billDate; ?></td>
-        </tr>
-        <tr>
-            <td><strong>Energy Consumption:</strong></td>
-            <td><?php echo $monthlyConsumption; ?> kWh</td>
-        </tr>
-        <tr>
-            <td><strong>Total Amount Due:</strong></td>
-            <td>₱<?php echo number_format($totalPay, 2); ?></td>
-        </tr>
-        <tr>
-            <td><strong>Consumption Status:</strong></td>
-            <td><?php echo $consumptionStatus; ?></td>
-        </tr>
-    </tbody>
-</table>
-
+        <table class="table table-striped table-dark">
+            <tbody>
+                <tr>
+                    <td><strong>Date:</strong></td>
+                    <td><?php echo $billDate; ?></td>
+                </tr>
+                <tr>
+                    <td><strong>Energy Consumption:</strong></td>
+                    <td><?php echo $monthlyConsumption; ?> kWh</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Amount Due:</strong></td>
+                    <td>₱<?php echo number_format($totalPay, 2); ?></td>
+                </tr>
+                <tr>
+                    <td><strong>Consumption Status:</strong></td>
+                    <td><?php echo $consumptionStatus; ?></td>
+                </tr>
+                
+            </tbody>
+        </table>
+        <button class="btn btn-primary print-monthly-pay" data-consumer-id="<?php echo $consumer_id; ?>">Print Bill</button>
         <h4>Previous Bills:</h4>
         <table class="table table-striped table-dark">
             <thead>
