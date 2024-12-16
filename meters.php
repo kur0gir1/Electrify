@@ -135,7 +135,7 @@ LEFT JOIN
     echo "<table class='table table-responsive mt-4'>";
     echo "<thead>";
     echo "<tr>";
-    echo "<th>Record ID ID</th>";
+    echo "<th>Record ID</th>";
     echo "<th>Meter ID</th>";
     echo "<th>Manufacture Date</th>";
     echo "<th>Installation Date</th>";

@@ -39,8 +39,8 @@ SELECT
     c.last_name, 
     em.meter_id,
     dc.energy_consumed AS recent_consumption,
-    (dc.energy_consumed * 7) AS monthly_consumption,
-    (dc.energy_consumed * 30 * 7) AS total_pay,
+    (dc.energy_consumed * 30) AS monthly_consumption,
+    (dc.energy_consumed * 30 * 6) AS total_pay,
     dc.date AS bill_date,
     dc.status AS consumption_status  -- Add status from consumption_records
 FROM 
@@ -79,7 +79,7 @@ $sql_previous_bills = "
 SELECT 
     dc.energy_consumed, 
     (dc.energy_consumed * 7) AS monthly_consumption,
-    (dc.energy_consumed * 30 * 7) AS total_pay,
+    (dc.energy_consumed * 30 * 6) AS total_pay,
     dc.date AS bill_date,
     dc.status AS consumption_status  -- Add status from consumption_records
 FROM 
